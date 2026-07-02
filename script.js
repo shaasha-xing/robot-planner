@@ -1,112 +1,177 @@
-// public/script.js - 机械臂规划前端逻辑（无密钥版）
+// 配置
+const API_URL = 'https://robot-arm-agent-fpbggcbeod.cn-hangzhou.fcapp.run/api/plan'; // 你的 FC 公网地址
 
+// DOM 元素
+const messageList = document.getElementById('messageList');
 const taskInput = document.getElementById('taskInput');
+const sendBtn = document.getElementById('sendBtn');
 const imageInput = document.getElementById('imageInput');
 const fileNameSpan = document.getElementById('fileName');
-const imagePreview = document.getElementById('imagePreview');
-const planBtn = document.getElementById('planBtn');
-const resultDiv = document.getElementById('result');
-const statusDiv = document.getElementById('status');
+const statusBar = document.getElementById('statusBar');
+const clearBtn = document.getElementById('clearBtn');
+const temperatureSlider = document.getElementById('temperature');
+const tempValue = document.getElementById('tempValue');
+const exampleBtns = document.querySelectorAll('.example-btn');
 
-// --- 图片上传预览 ---
+// 状态
+let isProcessing = false;
+let currentImageBase64 = null;
+
+// --- 温度滑块 ---
+temperatureSlider.addEventListener('input', () => {
+    tempValue.textContent = temperatureSlider.value;
+});
+
+// --- 图片上传 ---
 imageInput.addEventListener('change', function(e) {
     const file = this.files[0];
     if (file) {
         fileNameSpan.textContent = file.name;
-        // 显示预览图
         const reader = new FileReader();
-        reader.onload = function(ev) {
-            imagePreview.innerHTML = `<img src="${ev.target.result}" alt="场景预览" />`;
-            imagePreview.style.display = 'block';
+        reader.onload = (ev) => {
+            currentImageBase64 = ev.target.result;
         };
         reader.readAsDataURL(file);
     } else {
         fileNameSpan.textContent = '未选择文件';
-        imagePreview.style.display = 'none';
+        currentImageBase64 = null;
     }
 });
 
-// --- 快捷键：Ctrl + Enter 生成 ---
-taskInput.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.key === 'Enter') {
-        e.preventDefault();
-        generatePlan();
-    }
-});
-
-// --- 生成规划主函数 ---
-planBtn.addEventListener('click', generatePlan);
-
-async function generatePlan() {
+// --- 发送消息 ---
+async function sendMessage() {
+    if (isProcessing) return;
     const task = taskInput.value.trim();
     if (!task) {
-        setStatus('⚠️ 请先描述机械臂任务', 'error');
-        taskInput.focus();
+        setStatus('请描述任务', 'error');
         return;
     }
 
-    // 启用加载状态
-    planBtn.disabled = true;
-    planBtn.textContent = '⏳ 规划中...';
-    resultDiv.textContent = '🤔 AI 正在分析任务并规划动作...';
-    resultDiv.className = 'result-box loading';
-    setStatus('🔄 正在请求后端服务，请稍候...', '');
+    // 添加用户消息到界面
+    addMessage('user', task, currentImageBase64 ? { image: currentImageBase64 } : null);
+
+    // 清空输入框，禁用按钮
+    taskInput.value = '';
+    sendBtn.disabled = true;
+    isProcessing = true;
+    setStatus('AI 思考中...', 'thinking');
+
+    // 添加加载占位消息
+    const loadingMsg = addMessage('system', '⏳ 正在规划...', null, true);
 
     try {
-        // 1. 处理图片（如果有）
-        let imageBase64 = null;
-        if (imageInput.files && imageInput.files.length > 0) {
-            const file = imageInput.files[0];
-            imageBase64 = await fileToBase64(file);
-        }
+        // 构建请求参数
+        const body = {
+            task: task,
+            imageBase64: currentImageBase64 || null,
+            temperature: parseFloat(temperatureSlider.value)
+        };
 
-        // 2. 调用后端 API（安全代理）
-        const response = await fetch('https://robot-arm-agent-fpbggcbeod.cn-hangzhou.fcapp.run', {
+        const response = await fetch(API_URL, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                task: task,
-                imageBase64: imageBase64
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
         });
 
         const data = await response.json();
 
+        // 移除加载消息
+        loadingMsg.remove();
+
         if (!response.ok) {
-            throw new Error(data.error || `请求失败 (HTTP ${response.status})`);
+            throw new Error(data.error || `HTTP ${response.status}`);
         }
 
-        // 3. 显示规划结果
-        resultDiv.textContent = data.plan;
-        resultDiv.className = 'result-box';
-        setStatus('✅ 规划生成成功！', 'success');
+        // 添加AI回复
+        addMessage('system', data.plan || '未收到有效回复');
+        setStatus('规划完成 ✅', 'success');
+
+        // 清空图片（可选）
+        imageInput.value = '';
+        fileNameSpan.textContent = '未选择文件';
+        currentImageBase64 = null;
 
     } catch (error) {
-        console.error('规划生成错误:', error);
-        resultDiv.textContent = `❌ 生成规划时出错：\n${error.message}`;
-        resultDiv.className = 'result-box';
-        setStatus('❌ 任务失败，请检查网络或稍后重试', 'error');
+        loadingMsg.remove();
+        addMessage('system', `❌ 错误：${error.message}`);
+        setStatus('请求失败', 'error');
+        console.error('规划错误:', error);
     } finally {
-        // 恢复按钮
-        planBtn.disabled = false;
-        planBtn.textContent = '🚀 生成动作规划';
+        sendBtn.disabled = false;
+        isProcessing = false;
+        taskInput.focus();
+        // 如果状态是thinking，重置
+        if (statusBar.textContent.includes('思考')) {
+            setStatus('就绪', '');
+        }
     }
 }
 
-// --- 工具函数：文件转 Base64 ---
-function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = (err) => reject(err);
-        reader.readAsDataURL(file);
-    });
+// --- 添加消息到界面 ---
+function addMessage(role, content, meta = null, isLoading = false) {
+    const div = document.createElement('div');
+    div.className = `message ${role}`;
+    if (isLoading) div.classList.add('loading');
+
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.textContent = role === 'user' ? '👤' : '🤖';
+    div.appendChild(avatar);
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'content';
+
+    if (role === 'user' && meta?.image) {
+        const img = document.createElement('img');
+        img.src = meta.image;
+        img.alt = '上传的图片';
+        contentDiv.appendChild(img);
+    }
+
+    const textNode = document.createTextNode(content);
+    contentDiv.appendChild(textNode);
+    div.appendChild(contentDiv);
+
+    messageList.appendChild(div);
+    // 滚动到底部
+    const container = document.getElementById('chatContainer');
+    container.scrollTop = container.scrollHeight;
+    return div;
 }
 
-// --- 设置状态信息 ---
-function setStatus(message, type = '') {
-    statusDiv.textContent = message;
-    statusDiv.className = 'status ' + type;
+// --- 清空对话 ---
+function clearChat() {
+    if (confirm('确定清空所有对话吗？')) {
+        messageList.innerHTML = `
+            <div class="message system">
+                <div class="avatar">💡</div>
+                <div class="content">对话已重置。请描述你的机械臂任务。</div>
+            </div>
+        `;
+        setStatus('已清空', '');
+    }
 }
+
+// --- 设置状态栏 ---
+function setStatus(text, type = '') {
+    statusBar.textContent = text;
+    statusBar.style.color = type === 'error' ? '#f87171' : type === 'success' ? '#34d399' : type === 'thinking' ? '#fbbf24' : '#667a99';
+}
+
+// --- 事件绑定 ---
+sendBtn.addEventListener('click', sendMessage);
+taskInput.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.key === 'Enter') sendMessage();
+});
+clearBtn.addEventListener('click', clearChat);
+
+// 快速示例填充
+exampleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        taskInput.value = btn.textContent;
+        taskInput.focus();
+    });
+});
+
+// 初始状态
+setStatus('就绪');
