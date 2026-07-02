@@ -3,62 +3,63 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>机械臂动作规划智能体</title>
+    <title>机械臂规划智能体</title>
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div class="container">
-        <!-- 头部 -->
+    <div id="app">
+        <!-- 顶栏 -->
         <header>
-            <h1>🤖 机械臂动作自动规划智能体</h1>
-            <p class="subtitle">基于 Qwen3.7-Plus 多模态大模型 · 企业级安全托管</p>
+            <div class="logo">
+                <span class="icon">🤖</span>
+                <span class="title">机械臂动作规划智能体</span>
+                <span class="badge">v1.0</span>
+            </div>
+            <div class="header-actions">
+                <button id="clearBtn" title="清空对话">🗑️</button>
+            </div>
         </header>
 
-        <!-- 安全提示横幅 -->
-        <div class="info-banner">
-            🔒 API Key 已由服务器安全托管，无需手动输入，密钥零暴露风险
-        </div>
-
-        <!-- 任务输入区 -->
-        <div class="input-section">
-            <label for="taskInput">📝 描述机械臂任务</label>
-            <textarea 
-                id="taskInput" 
-                rows="4" 
-                placeholder="例如：请规划一个将红色方块从A点（坐标1,2,0）抓取并移动到B点（坐标4,5,2）的动作序列，要求路径平滑..."
-            ></textarea>
-        </div>
-
-        <!-- 图片上传（多模态能力） -->
-        <div class="input-section">
-            <label for="imageInput">🖼️ 上传工作场景图（可选）</label>
-            <div class="file-upload-wrapper">
-                <input type="file" id="imageInput" accept="image/*" />
-                <span id="fileName">未选择文件</span>
+        <!-- 主内容区：对话记录 -->
+        <main id="chatContainer">
+            <div id="messageList">
+                <!-- 动态添加消息 -->
+                <div class="message system">
+                    <div class="avatar">💡</div>
+                    <div class="content">
+                        你好！我是机械臂动作规划专家。<br />
+                        请描述你的任务（可附带场景图片），我将为你生成详细的动作序列。
+                    </div>
+                </div>
             </div>
-            <div id="imagePreview"></div>
-        </div>
+        </main>
 
-        <!-- 生成按钮 -->
-        <button id="planBtn">🚀 生成动作规划</button>
-
-        <!-- 状态提示 -->
-        <div id="status" class="status"></div>
-
-        <!-- 结果展示 -->
-        <div class="result-section">
-            <h3>📋 规划结果</h3>
-            <div id="result" class="result-box">
-                等待任务输入...
+        <!-- 底栏：输入区 -->
+        <footer>
+            <div class="input-area">
+                <div class="toolbar">
+                    <label for="imageInput" class="file-btn">🖼️ 图片</label>
+                    <input type="file" id="imageInput" accept="image/*" style="display:none" />
+                    <span id="fileName" class="file-name">未选择文件</span>
+                    <div class="param-group">
+                        <label>温度 <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.3" /></label>
+                        <span id="tempValue">0.3</span>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <textarea id="taskInput" rows="2" placeholder="输入任务描述，例如：将红色方块从A点移动到B点..."></textarea>
+                    <button id="sendBtn">发送 ➤</button>
+                </div>
+                <div class="quick-examples">
+                    <span>快速示例：</span>
+                    <button class="example-btn">抓取并放置方块</button>
+                    <button class="example-btn">绘制圆形轨迹</button>
+                    <button class="example-btn">堆叠三个物体</button>
+                </div>
             </div>
-        </div>
-
-        <!-- 底部快捷键提示 -->
-        <div class="footer-tip">
-            💡 提示：按 <kbd>Ctrl</kbd> + <kbd>Enter</kbd> 快速生成
-        </div>
+            <div id="statusBar">就绪</div>
+        </footer>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
