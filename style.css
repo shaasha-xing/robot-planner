@@ -1,0 +1,320 @@
+/* ===== 全局重置 & 字体 ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(145deg, #0b0e1a 0%, #1a1f35 50%, #0f233a 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    margin: 0;
+}
+
+/* ===== 主容器 ===== */
+.container {
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(10px);
+    border-radius: 28px;
+    padding: 40px 45px;
+    max-width: 860px;
+    width: 100%;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+}
+
+/* ===== 头部 ===== */
+header {
+    margin-bottom: 28px;
+    border-bottom: 3px solid #eef2f7;
+    padding-bottom: 16px;
+}
+
+h1 {
+    font-size: 30px;
+    font-weight: 800;
+    color: #0a0e1a;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.subtitle {
+    font-size: 15px;
+    color: #5a6a7e;
+    font-weight: 500;
+    margin-top: 4px;
+    letter-spacing: 0.3px;
+}
+
+/* ===== 安全横幅 ===== */
+.info-banner {
+    background: #eaf5ff;
+    border-left: 5px solid #4a6cf7;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a3a6a;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(74, 108, 247, 0.08);
+}
+
+/* ===== 输入区域 ===== */
+.input-section {
+    margin-bottom: 24px;
+}
+
+.input-section label {
+    display: block;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 8px;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+}
+
+.input-section textarea {
+    width: 100%;
+    padding: 16px 18px;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    font-size: 15px;
+    font-family: inherit;
+    resize: vertical;
+    transition: all 0.3s ease;
+    background: #fafcff;
+    color: #0f172a;
+    line-height: 1.6;
+}
+
+.input-section textarea:focus {
+    border-color: #4a6cf7;
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(74, 108, 247, 0.12);
+    background: #ffffff;
+}
+
+/* ===== 文件上传 ===== */
+.file-upload-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.file-upload-wrapper input[type="file"] {
+    padding: 10px 14px;
+    background: #f1f5f9;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #334155;
+    transition: all 0.3s;
+    width: auto;
+}
+
+.file-upload-wrapper input[type="file"]:hover {
+    background: #e9eef3;
+    border-color: #4a6cf7;
+}
+
+.file-upload-wrapper #fileName {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+#imagePreview {
+    margin-top: 12px;
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid #e2e8f0;
+    display: none;
+}
+
+#imagePreview img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ===== 生成按钮 ===== */
+#planBtn {
+    width: 100%;
+    padding: 18px 24px;
+    background: linear-gradient(135deg, #4a6cf7 0%, #7c3aed 100%);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-size: 19px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 8px 0 18px 0;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 24px rgba(74, 108, 247, 0.3);
+}
+
+#planBtn:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 35px rgba(74, 108, 247, 0.45);
+}
+
+#planBtn:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+#planBtn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 4px 12px rgba(74, 108, 247, 0.15);
+}
+
+/* ===== 状态提示 ===== */
+.status {
+    min-height: 28px;
+    font-size: 15px;
+    font-weight: 500;
+    text-align: center;
+    margin: 6px 0 12px 0;
+    padding: 4px 0;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.status.error {
+    color: #dc2626;
+    background: #fef2f2;
+}
+
+.status.success {
+    color: #16a34a;
+    background: #f0fdf4;
+}
+
+/* ===== 结果区域 ===== */
+.result-section {
+    margin-top: 8px;
+}
+
+.result-section h3 {
+    color: #1e293b;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.result-box {
+    background: #f8fafc;
+    border: 2px solid #e9edf2;
+    padding: 24px 28px;
+    border-radius: 16px;
+    min-height: 120px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 15px;
+    line-height: 1.9;
+    color: #0f172a;
+    transition: all 0.3s ease;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.result-box.loading {
+    background: #f1f5f9;
+    color: #475569;
+    font-style: italic;
+    border-color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+/* 加载时的动态点点点（纯CSS） */
+.result-box.loading::after {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4a6cf7;
+    animation: dotPulse 1.2s infinite;
+    box-shadow: 12px 0 0 #4a6cf7, 24px 0 0 #4a6cf7;
+}
+
+@keyframes dotPulse {
+    0% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+    100% { opacity: 0.3; transform: scale(0.8); }
+}
+
+/* ===== 底部快捷键 ===== */
+.footer-tip {
+    margin-top: 24px;
+    text-align: center;
+    font-size: 13px;
+    color: #94a3b8;
+    border-top: 1px solid #eef2f7;
+    padding-top: 18px;
+}
+
+.footer-tip kbd {
+    background: #eef2f7;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #1e293b;
+    border: 1px solid #d1d9e6;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* ===== 响应式适配 ===== */
+@media (max-width: 640px) {
+    .container {
+        padding: 24px 18px;
+        border-radius: 20px;
+    }
+
+    h1 {
+        font-size: 22px;
+        flex-wrap: wrap;
+    }
+
+    .subtitle {
+        font-size: 13px;
+    }
+
+    .file-upload-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #planBtn {
+        font-size: 17px;
+        padding: 16px;
+    }
+
+    .result-box {
+        padding: 16px 18px;
+        font-size: 14px;
+    }
+}
