@@ -61,7 +61,7 @@ async function generatePlan() {
         }
 
         // 2. 调用后端 API（安全代理）
-        const response = await fetch('https://robot-arm-agent-fpbgcbeod.cn-hangzhou.fcapp.run/api/plan', {
+        const response = await fetch('https://robot-arm-agent-fpbggcbeod.cn-hangzhou.fcapp.run', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
